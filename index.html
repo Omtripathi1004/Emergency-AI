@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency AI - Disaster Assessment & Response Command</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    window.addEventListener('error', function(e) {
+      var errDiv = document.getElementById('debug-error-bar');
+      if (!errDiv) {
+        errDiv = document.createElement('div');
+        errDiv.id = 'debug-error-bar';
+        errDiv.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:#ef4444;color:#fff;padding:12px;z-index:9999;font-family:monospace;font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,0.5);text-align:center;';
+        document.body.appendChild(errDiv);
+      }
+      errDiv.innerHTML = '<strong>JS Error:</strong> ' + e.message + ' (' + e.filename.split('/').pop() + ':' + e.lineno + ')';
+    });
+  </script>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="logo-container">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none">
+          <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5" />
+          <polyline points="12 22 12 12" />
+          <polyline points="12 12 22 8.5" />
+          <polyline points="12 12 2 8.5" />
+        </svg>
+      </div>
+      <h1 class="logo-text">EMERGENCY AI</h1>
+      <span class="logo-badge">Agents for Good</span>
+    </div>
+
+    <div class="system-status">
+      <div class="status-indicator">
+        <span class="status-dot green"></span>
+        <span>Active Response Mode</span>
+      </div>
+      <div class="status-indicator">
+        <span class="status-dot blue"></span>
+        <span>AI Engine: Nominal</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <ul class="nav-menu">
+        <li class="nav-item active" data-tab="dashboard">
+          <a class="nav-link">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+              <rect x="3" y="3" width="7" height="9" />
+              <rect x="14" y="3" width="7" height="5" />
+              <rect x="14" y="12" width="7" height="9" />
+              <rect x="3" y="16" width="7" height="5" />
+            </svg>
+            <span>AI Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item" data-tab="shelters">
+          <a class="nav-link">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span>Safe Shelters</span>
+          </a>
+        </li>
+        <li class="nav-item" data-tab="routing">
+          <a class="nav-link">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+              <circle cx="6" cy="6" r="3" />
+              <circle cx="18" cy="18" r="3" />
+              <line x1="6" y1="9" x2="6" y2="15" />
+              <line x1="18" y1="9" x2="18" y2="15" />
+              <path d="M6 15a3 3 0 0 0 3 3h6" />
+            </svg>
+            <span>Safe Routes</span>
+          </a>
+        </li>
+        <li class="nav-item" data-tab="medical">
+          <a class="nav-link">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+            <span>First Aid & SOS</span>
+          </a>
+        </li>
+        <li class="nav-item" data-tab="supplies">
+          <a class="nav-link">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+              <polyline points="9 11 12 14 22 4" />
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+            </svg>
+            <span>Supplies Checklist</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <p>Command Center Node ID: EAI-NODE-2026</p>
+        <p style="margin-top: 4px; color: var(--color-warning);">⚠️ Emergency? Dial 911 / 112</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-content">
+
+      <!-- ================= TABS CONTENT ================= -->
+
+      <!-- Tab 1: AI Dashboard -->
+      <div id="dashboard" class="content-panel active">
+        <!-- Live Alert Banner -->
+        <div class="ticker-container">
+          <div class="ticker-label">
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            Live Alert
+          </div>
+          <div class="ticker-content">
+            <div class="ticker-text" id="live-alert-ticker">
+              🚨 CRITICAL: Flood warnings issued for Sectors A, B, and C. Water levels rising. | 🏠 Shelter 2 and 4 at full capacity. | 🚧 Hazard: Road blockages detected on highway Route 5. Redirecting medical dispatch.
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Column Left -->
+          <div class="col-left">
+            <!-- Map Card -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                    <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
+                    <line x1="8" y1="2" x2="8" y2="18" />
+                    <line x1="16" y1="6" x2="16" y2="22" />
+                  </svg>
+                  Interactive Live Hazard Map
+                </h3>
+                <div class="map-controls">
+                  <button class="map-btn" id="btn-simulate-disaster" title="Simulate Disaster Sweep">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                    </svg>
+                  </button>
+                  <button class="map-btn" id="btn-radar-scan" title="Trigger Radar Scan">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 2a10 10 0 0 1 10 10" />
+                    </svg>
+                  </button>
+                  <button class="map-btn" id="btn-weather-radar" title="Toggle Weather Satellite Radar">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                      <path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25" />
+                      <line x1="8" y1="16" x2="8.01" y2="16" />
+                      <line x1="8" y1="20" x2="8.01" y2="20" />
+                      <line x1="12" y1="18" x2="12.01" y2="18" />
+                      <line x1="12" y1="22" x2="12.01" y2="22" />
+                      <line x1="16" y1="16" x2="16.01" y2="16" />
+                      <line x1="16" y1="20" x2="16.01" y2="20" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Map Canvas Frame -->
+              <div class="map-widget-container">
+                <canvas id="map-canvas"></canvas>
+                <div class="map-legend">
+                  <div class="legend-item"><span class="legend-dot red"></span><span>Hazard Zone</span></div>
+                  <div class="legend-item"><span class="legend-dot orange"></span><span>Blocked Road</span></div>
+                  <div class="legend-item"><span class="legend-dot green"></span><span>Safe Shelter</span></div>
+                  <div class="legend-item"><span class="legend-dot blue"></span><span>Active User</span></div>
+                  <div class="legend-item" id="legend-weather-container" style="display: none;"><span class="legend-dot" style="background: rgba(6, 182, 212, 0.3); border: 1px solid var(--color-ai);"></span><span>Rain Cell</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats Block -->
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-val green" id="stat-shelters-open">12</div>
+                <div class="stat-lbl">Shelters Open</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-val orange" id="stat-roads-blocked">4</div>
+                <div class="stat-lbl">Road Blockages</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-val red" id="stat-active-threats">3</div>
+                <div class="stat-lbl">Active Hazards</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column Right -->
+          <div class="col-right">
+            <!-- System Log / Assessment -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                    <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+                  </svg>
+                  AI Damage Assessment Feed
+                </h3>
+              </div>
+              <div class="news-feed" id="news-feed-container">
+                <!-- Dynamically Populated -->
+              </div>
+            </div>
+
+            <!-- Emergency Triage Dispatch Queue -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                  Emergency Dispatch Queue
+                </h3>
+                <span class="logo-badge" style="background: rgba(239, 68, 68, 0.1); border-color: var(--color-danger); color: var(--color-danger);">Active</span>
+              </div>
+              <div class="dispatch-list" id="dispatch-queue-container">
+                <!-- Dynamically Populated -->
+              </div>
+            </div>
+
+            <!-- Emergency Broadcast System -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                  </svg>
+                  Emergency Broadcast System
+                </h3>
+              </div>
+              <div class="broadcast-widget-form">
+                <div class="form-row">
+                  <label class="filter-label">Broadcast Target Area</label>
+                  <select class="filter-input" id="broadcast-scope" style="padding: 8px 12px; font-size:12px;">
+                    <option value="all">Global Alert (All Sectors)</option>
+                    <option value="C">Sector C Only (Lowland Flood Warning)</option>
+                    <option value="F">Sector F Only (Hillside Landslip Warning)</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label class="filter-label">Custom Warning Message</label>
+                  <input type="text" class="filter-input" id="broadcast-msg-input" placeholder="Enter emergency message..." value="IMMEDIATE EVACUATION ORDER: Evacuate low-lying river areas immediately." style="padding: 8px 12px; font-size:12px;">
+                </div>
+                <button class="btn-primary" id="btn-send-broadcast" style="padding: 8px 14px; font-size:12px;">
+                  ⚡ Transmit Alert Broadcast
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Shelter Finder -->
+      <div id="shelters" class="content-panel">
+        <div class="shelter-layout">
+          <!-- Filters & List -->
+          <div class="shelter-filters card">
+            <div class="filter-group">
+              <label class="filter-label">Search Shelters</label>
+              <input type="text" class="filter-input" id="shelter-search" placeholder="Type sector or name...">
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Filter Amenities</label>
+              <select class="filter-input" id="shelter-amenity-filter">
+                <option value="all">All Amenities</option>
+                <option value="medical">Medical Station</option>
+                <option value="power">Generator Power</option>
+                <option value="pet">Pet Friendly</option>
+                <option value="meals">Hot Meals</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Availability</label>
+              <select class="filter-input" id="shelter-status-filter">
+                <option value="all">All Statuses</option>
+                <option value="has-space">Has Available Capacity</option>
+              </select>
+            </div>
+            <div class="shelter-list" id="shelter-list-container">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+
+          <!-- Detailed Panel -->
+          <div class="card" style="display: flex; flex-direction: column;">
+            <div id="shelter-detail-empty" style="margin: auto; text-align: center; color: var(--color-text-muted);">
+              <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none" style="margin-bottom: 12px; color: var(--color-ai);">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              </svg>
+              <p>Select a shelter from the list to view live occupancy, facilities, and contact dispatch details.</p>
+            </div>
+
+            <div id="shelter-detail-content" style="display: none; height: 100%; justify-content: space-between; flex-direction: column;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 16px; margin-bottom: 20px;">
+                  <h2 id="detail-shelter-name" style="font-family: var(--font-header); font-weight: 600; font-size: 24px;">Shelter Alpha</h2>
+                  <span id="detail-shelter-status" class="logo-badge" style="background: rgba(16, 185, 129, 0.1); border-color: var(--color-safety); color: var(--color-safety);">OPEN</span>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                  <h4 class="filter-label" style="margin-bottom: 8px;">Location Sector</h4>
+                  <p id="detail-shelter-location" style="font-size: 15px;">Sector A - 1.2 km away</p>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px;">
+                    <span class="filter-label">Occupancy Status</span>
+                    <span id="detail-shelter-occupancy-ratio" style="font-weight: 600;">85 / 120 (70%)</span>
+                  </div>
+                  <div class="occupancy-bar-container" style="height: 10px;">
+                    <div id="detail-shelter-occupancy-bar" class="occupancy-bar warning" style="width: 70%;"></div>
+                  </div>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                  <h4 class="filter-label" style="margin-bottom: 10px;">Available Amenities</h4>
+                  <div id="detail-shelter-amenities" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <!-- Dynamically Populated -->
+                  </div>
+                </div>
+
+                <div>
+                  <h4 class="filter-label" style="margin-bottom: 8px;">Emergency Services Notes</h4>
+                  <p id="detail-shelter-notes" style="font-size: 14px; color: var(--color-text-muted); line-height: 1.5; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-light); border-radius: 8px;">
+                    Fully equipped medical tent, hot meal service starting at 18:00, clean drinking water distribution point.
+                  </p>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn-primary" id="btn-shelter-route">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                    <circle cx="12" cy="12" r="10" /><polygon points="16.2 7.8 13.5 13.5 7.8 16.2 10.5 10.5 16.2 7.8" />
+                  </svg>
+                  Calculate Safe Path to Shelter
+                </button>
+                <button class="btn-secondary" id="btn-shelter-contact">
+                  <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                  </svg>
+                  Contact Dispatcher
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Safe Routes -->
+      <div id="routing" class="content-panel">
+        <div class="routing-container">
+          <!-- Input Form -->
+          <div class="card routing-form">
+            <h3 class="card-title" style="margin-bottom: 8px;">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" /><circle cx="12" cy="10" r="3" />
+              </svg>
+              Safe Path Calculator
+            </h3>
+            <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.4; margin-bottom: 8px;">
+              Enter your current Sector and target destination to check if connection paths are safe from active flooding or roadblocks.
+            </p>
+
+            <div class="form-row">
+              <label class="filter-label">Current Sector</label>
+              <select class="filter-input" id="route-start">
+                <option value="A">Sector A (North Chennai - Vyasarpadi)</option>
+                <option value="B">Sector B (East Coast - Adyar)</option>
+                <option value="C">Sector C (Lowland Basin - Velachery)</option>
+                <option value="D">Sector D (Central Hub - Nungambakkam)</option>
+                <option value="E">Sector E (Industrial Belt - Guindy)</option>
+                <option value="F">Sector F (Southern Outskirts - Tambaram)</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label class="filter-label">Destination</label>
+              <select class="filter-input" id="route-end">
+                <option value="Shelter 1">Shelter Alpha (Sector A)</option>
+                <option value="Shelter 2" selected>Shelter Beta (Sector D)</option>
+                <option value="Shelter 3">Shelter Gamma (Sector B)</option>
+                <option value="Shelter 4">Shelter Delta (Sector E)</option>
+              </select>
+            </div>
+
+            <button class="btn-primary" id="btn-assess-route" style="margin-top: 8px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none">
+                <polyline points="22 11 12 2 2 11" /><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5" />
+              </svg>
+              Assess Route Safety
+            </button>
+
+            <!-- Route Assessment Output Container -->
+            <div class="route-results" id="route-results-container" style="display: none;">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+
+          <!-- Map Visualization Card -->
+          <div class="card" style="display: flex; flex-direction: column;">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                Active Road Blocks & Routing View
+              </h3>
+              <span class="logo-badge" id="routing-system-status" style="background: rgba(16, 185, 129, 0.1); border-color: var(--color-safety); color: var(--color-safety);">Live Link Active</span>
+            </div>
+            <!-- Canvas is linked with app.js to draw routing layers -->
+            <div class="map-widget-container" style="flex: 1; height: 100%;">
+              <canvas id="route-map-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Medical / SOS Triage -->
+      <div id="medical" class="content-panel">
+        <div class="triage-grid">
+          <!-- Column Left: Chat console -->
+          <div class="card chat-card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                AI SOS Dispatch & Assessment Assistant
+              </h3>
+              <span class="logo-badge" style="background: rgba(6, 182, 212, 0.15); border-color: var(--color-ai); color: var(--color-ai);">Triage Bot v4.2</span>
+            </div>
+
+            <div class="chat-messages" id="chat-messages-container">
+              <div class="chat-bubble bot">
+                Hello. I am the Emergency AI triage system. If you are experiencing a disaster situation, tell me what is happening.
+                <br><br>
+                For example, tell me:
+                <br><em>"I am trapped in Sector C (Velachery) due to rising flood waters and need rescue"</em> or 
+                <br><em>"We have a person with a severe leg injury and bleeding in Sector D (Nungambakkam)"</em>.
+              </div>
+            </div>
+
+            <div class="chat-input-container">
+              <input type="text" class="chat-input" id="chat-user-input" placeholder="Explain your situation and location...">
+              <button class="btn-send" id="btn-chat-send">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Column Right: Rescue details & Medical Guides -->
+          <div class="triage-panel-right">
+            <!-- Active SOS status -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" />
+                  </svg>
+                  Triage Assessment Details
+                </h3>
+              </div>
+              
+              <div class="triage-status-display">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span class="filter-label">AI Priority Level</span>
+                  <div class="triage-badge none" id="triage-priority-tag">NONE DETECTED</div>
+                </div>
+                <div style="border-top: 1px solid var(--border-light); padding-top: 12px; margin-top: 6px;">
+                  <p class="filter-label">Recommended Immediate Actions</p>
+                  <ul id="triage-recommendations-list" style="margin-left: 18px; margin-top: 8px; font-size: 13px; color: var(--color-text-muted); line-height: 1.5; display: flex; flex-direction: column; gap: 6px;">
+                    <li>Describe your emergency in the chat box.</li>
+                    <li>State your coordinates or sector location clearly.</li>
+                    <li>Wait for the priority scoring to generate dispatch alerts.</li>
+                  </ul>
+                </div>
+                <div style="border-top: 1px solid var(--border-light); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                  <span class="filter-label">Rescue Dispatch Status</span>
+                  <span id="triage-dispatch-status" style="font-size: 13px; font-weight: 600; color: var(--color-text-muted);">Idle / Awaiting Report</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hotline Panel -->
+            <div class="card">
+              <div class="card-header" style="margin-bottom: 12px;">
+                <h3 class="card-title">
+                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                    <circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                  Critical Emergency Hotlines
+                </h3>
+              </div>
+              <div class="hotline-grid">
+                <div class="hotline-card">
+                  <div class="filter-label">NDRF Emergency</div>
+                  <div class="hotline-number">1078 / 112</div>
+                </div>
+                <div class="hotline-card">
+                  <div class="filter-label">State Control Room</div>
+                  <div class="hotline-number">1070</div>
+                </div>
+                <div class="hotline-card">
+                  <div class="filter-label">District Control Desk</div>
+                  <div class="hotline-number">1077</div>
+                </div>
+                <div class="hotline-card">
+                  <div class="filter-label">Ambulance Triage</div>
+                  <div class="hotline-number">108 / 104</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- First aid references -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" />
+                  </svg>
+                  Interactive First Aid Reference
+                </h3>
+              </div>
+              <div class="firstaid-guide">
+                <div class="firstaid-item">
+                  <div class="firstaid-header">🩸 Heavy Bleeding</div>
+                  <ol class="firstaid-steps">
+                    <li>Apply direct pressure with a clean cloth or bandage.</li>
+                    <li>Keep pressure applied until bleeding stops or help arrives.</li>
+                    <li>If limbs are bleeding severely and pressure fails, prepare a tourniquet high and tight.</li>
+                  </ol>
+                </div>
+                <div class="firstaid-item">
+                  <div class="firstaid-header">💧 Water Submersion / Near Drowning</div>
+                  <ol class="firstaid-steps">
+                    <li>Remove person safely from water. Avoid putting yourself in danger.</li>
+                    <li>Check responsiveness and breathing. If unconscious/not breathing, call 911 immediately.</li>
+                    <li>Initiate CPR (30 chest compressions, followed by 2 rescue breaths).</li>
+                  </ol>
+                </div>
+                <div class="firstaid-item">
+                  <div class="firstaid-header">🦴 Fractures & Breaks</div>
+                  <ol class="firstaid-steps">
+                    <li>Do not attempt to push bone back or align the limb.</li>
+                    <li>Splint the joint above and below the fracture to stabilize it.</li>
+                    <li>Apply a cold pack wrapped in a cloth to reduce swelling.</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 5: Supplies Checklist -->
+      <div id="supplies" class="content-panel">
+        <div class="supply-container">
+          <!-- Setup Form -->
+          <div class="card">
+            <h3 class="card-title" style="margin-bottom: 8px;">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                <circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" />
+              </svg>
+              Supply List Customizer
+            </h3>
+            <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.4; margin-bottom: 16px;">
+              Specify details about your party and the disaster threat to generate a checklist of critical medications, food supplies, and safety gear.
+            </p>
+
+            <div class="form-row" style="margin-bottom: 12px;">
+              <label class="filter-label">Disaster Scenario</label>
+              <select class="filter-input" id="supply-scenario">
+                <option value="flood">Monsoon Flooding (Waterproof Bags, Chlorine Tablets, ORS)</option>
+                <option value="earthquake">Landslide / Seismic (Heavy Gloves, Whistle, Sturdy Boots)</option>
+                <option value="cyclone">Bay of Bengal Cyclone (Weather Radio, Tarpaulins, Ropes)</option>
+                <option value="accident">Transport Emergency (Trauma Bandages, High-Vis Vest)</option>
+              </select>
+            </div>
+
+            <div class="form-row" style="margin-bottom: 12px;">
+              <label class="filter-label">Number of People</label>
+              <input type="number" class="filter-input" id="supply-people-count" min="1" max="20" value="2">
+            </div>
+
+            <div class="form-row" style="margin-bottom: 16px;">
+              <label class="filter-label">Duration (Days)</label>
+              <select class="filter-input" id="supply-duration">
+                <option value="1">24 Hours (Immediate Grab-Bag)</option>
+                <option value="3" selected>72 Hours (Standard Safety Window)</option>
+                <option value="7">7 Days (Severe Isolation Setup)</option>
+              </select>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <button class="btn-primary" id="btn-generate-supplies">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Generate Safety Checklist
+              </button>
+              <button class="btn-secondary" id="btn-print-supplies" style="justify-content: center;">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
+                  <polyline points="6 9 6 2 18 2 18 9" />
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                  <rect x="6" y="14" width="12" height="8" />
+                </svg>
+                Print Supply List
+              </button>
+            </div>
+          </div>
+
+          <!-- Checklist Output -->
+          <div class="card" style="display: flex; flex-direction: column; height: 100%;">
+            <div class="checklist-header-actions" style="margin-bottom: 16px;">
+              <h3 class="card-title">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
+                </svg>
+                Your Customized Checklist
+              </h3>
+              <button class="btn-secondary" id="btn-reset-checklist">Clear Selections</button>
+            </div>
+
+            <div class="checklist-progress-container" style="margin-bottom: 16px;">
+              <div class="checklist-progress-info">
+                <span>Checklist Packing Progress</span>
+                <span id="checklist-progress-ratio">0 / 0 completed</span>
+              </div>
+              <div class="checklist-progress-bar">
+                <div class="checklist-progress-fill" id="checklist-progress-fill"></div>
+              </div>
+            </div>
+
+            <div class="checklist-items" id="checklist-items-container">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Emergency Broadcast Overlay Modal -->
+  <div class="broadcast-overlay" id="ebs-overlay">
+    <div class="broadcast-card">
+      <div class="broadcast-alert-title">⚠️ EMERGENCY AIR BROADCAST ⚠️</div>
+      <div class="broadcast-alert-msg" id="ebs-msg-text">
+        IMMEDIATE EVACUATION ORDER: Evacuate low-lying river areas immediately.
+      </div>
+      <button class="btn-primary" id="btn-close-broadcast" style="background:var(--color-danger); color:#fff; box-shadow:0 4px 15px var(--color-danger-glow); margin:0 auto; display:block;">
+        Acknowledge Broadcast Warning
+      </button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
