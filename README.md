@@ -20,6 +20,11 @@ During major natural disasters (like seasonal monsoons in Chennai, landslides in
 
 ## 🚀 Visual Features & Demos
 
+### 🎥 Interactive Application Walkthrough Video
+Watch the command center dashboard in action (radar scans, rescue dispatches, weather overlays, safe routing calculations, and supplies generator):
+
+![Emergency AI Application Walkthrough Video](./images/app_operation_demo.webp)
+
 ### 1. Interactive Live Hazard Radar Map
 Features a rotating radar scan, localized danger alerts, active shelter indicators, and animated rescue vehicles that travel from the central hub to incident sectors in real-time. Includes a toggleable **Weather Satellite Radar** to simulate rain/cyclone precipitation layers.
 
